@@ -3,11 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 void criarArquivo(int tam, char letra);
 
 int main(){
-	int TAM;
+	int TAM, n=0, repeticoes;
 	char c;
 	
 	printf("Tamanhos de arquivos: \n"); 
@@ -21,8 +22,14 @@ int main(){
 	printf("\n Digite a ordem de grandeza(K, M ou G): ");
 	scanf("\n%c", &c);
 	c = toupper(c);
-		
-	criarArquivo(TAM, c);
+	
+	printf("\n Digite o número de repetições: ");
+	scanf("%d", &repeticoes);	
+	
+	while (n < repeticoes){
+		criarArquivo(TAM, c);
+		n++;
+	}
 	
 	return 0;
 }
@@ -30,6 +37,8 @@ int main(){
 void criarArquivo(int tam, char letra){
 	int i, num=1;
 	FILE *arq;
+	clock_t inicio, fim; 
+	double dif_time;
 	
 	if(letra == 'K')
 		tam = tam*1024;
@@ -38,6 +47,7 @@ void criarArquivo(int tam, char letra){
 		 else if(letra == 'G')
 				tam = tam*1073741824;
 	
+	inicio = clock()/(CLOCKS_PER_SEC/1000);
 	arq = fopen("ARQUIVO", "w");
 	
 	for(i=1; i<=tam; i++){
@@ -45,8 +55,11 @@ void criarArquivo(int tam, char letra){
 	}		
 	
 	fclose(arq);
+	fim = clock()/(CLOCKS_PER_SEC/1000);
+	dif_time = fim - inicio;
 	
+	printf("\nTempo de execução foi de %0.1f ms", dif_time);
 	
-	
+	remove("Arquivo");
 	
 }
