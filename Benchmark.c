@@ -5,7 +5,8 @@
 #include <ctype.h>
 #include <time.h>
 
-void criarArquivo(int tam, char letra);
+double criarArquivo(int tam, char letra);
+double lerArquivo(int tam, char letra);
 
 int main(){
 	int TAM, n=0, repeticoes;
@@ -27,14 +28,14 @@ int main(){
 	scanf("%d", &repeticoes);	
 	
 	while (n < repeticoes){
-		criarArquivo(TAM, c);
+		printf("\nTempo de execução foi de %0.1f ms", criarArquivo(TAM, c));
 		n++;
 	}
 	
 	return 0;
 }
 
-void criarArquivo(int tam, char letra){
+double criarArquivo(int tam, char letra){
 	int i, num=1;
 	FILE *arq;
 	clock_t inicio, fim; 
@@ -58,8 +59,32 @@ void criarArquivo(int tam, char letra){
 	fim = clock()/(CLOCKS_PER_SEC/1000);
 	dif_time = fim - inicio;
 	
-	printf("\nTempo de execução foi de %0.1f ms", dif_time);
+	//remove("ARQUIVO");
 	
-	remove("Arquivo");
+	return dif_time;
 	
 }
+
+double lerArquivo(int tam, char letra){
+	int i;
+	FILE *arq;	
+	
+	
+	if(letra == 'K')
+		tam = tam*1024;
+	else if(letra == 'M')
+			tam = tam*1048576;
+		 else if(letra == 'G')
+				tam = tam*1073741824;
+	
+	arq = fopen("ARQUIVO", "r");
+	
+	for(i=1; i<=tam; i++){
+	
+	
+	
+	
+	
+	
+}
+
