@@ -2,44 +2,118 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <ctype.h>
+#include <math.h>
 #include <time.h>
 
-double criarArquivo(int tam, char letra);
-double lerArquivo(int tam, char letra);
+double escritaSequencial(int tam, char letra, int n);
+double leituraSequencial(int tam, char letra, int n);
+double escritaAleatoria(int tam, int n);
+double leituraAleatoria(int tam, int n);
+int pot(int i, int j);
 
 int main(){
-	int TAM, n=0, repeticoes;
+	int i, escolha, TAM, repeticoes;
 	char c;
+	double result;
 	
-	printf("Tamanhos de arquivos: \n"); 
-	printf("	1k/2k/4k/8k/16k/32k/64k/128k/256k/512k\n");
-	printf("	1M/2M/4M/8M/16M/32M/64M/128M/256M/512M\n");
-	printf("	1G/2G/4G/8G\n");
+	printf("Teste de Benchmark\n");
+	printf("\nDigite 1 para o teste de leitura sequencial");
+	printf("\nDigite 2 para o teste de escrita sequencial");
+	printf("\nDigite 3 para o teste de leitura aleatória");
+	printf("\nDigite 4 para o teste de escrita aleatória");
 	
-	printf("\n Digite o tamanho do arquivo(somente números): ");
+	printf("\n\nOpção desejada: ");
+	scanf("%d", &escolha);
+	
+	switch(escolha){
+		case 1: 
+			printf("\nDigite o tamanho do arquivo(somente números): ");
+			scanf("%d", &TAM);
+	
+			printf("\nDigite a ordem de grandeza(K, M ou G): ");
+			scanf("\n%c", &c);
+			c = toupper(c);
+			
+			printf("\nDigite o número de repetições: ");
+			scanf("%d", &repeticoes);
+			
+			result = leituraSequencial(TAM, c, repeticoes);
+			printf("\nThroughput médio p/ leitura sequencial foi de %f MiB/s", result);
+			break;
+		case 2: 
+			printf("\nDigite o tamanho do arquivo(somente números): ");
+			scanf("%d", &TAM);
+	
+			printf("\nDigite a ordem de grandeza(K, M ou G): ");
+			scanf("\n%c", &c);
+			c = toupper(c);
+			
+			printf("\nDigite o número de repetições: ");
+			scanf("%d", &repeticoes);
+			
+			result = escritaSequencial(TAM, c, repeticoes);
+			printf("\nThroughput médio p/ escrita sequencial foi de %f MiB/s", result);
+			break;
+		case 3:
+			printf("\nDigite o número de repetições: ");
+			scanf("%d", &repeticoes);
+			
+			for(i=0; i<=5; i++){
+				printf("\nThroughput médio p/ leitura aleatória p/ blocos de %d Kb foi de %f MiB/s", 
+				pot(2,i), leituraAleatoria(i, repeticoes));
+			} break;
+		case 4: 
+			printf("\nDigite o número de repetições: ");
+			scanf("%d", &repeticoes);
+		
+			for(i=0; i<=5; i++){
+				printf("\nThroughput médio p/ escrita aleatória p/ blocos de %d Kb foi de %f MiB/s", 
+				pot(2,i), escritaAleatoria(i, repeticoes));
+			} break;
+		
+	}	
+	
+	/*
+	printf("\n\nDigite o tamanho do arquivo(somente números): ");
 	scanf("%d", &TAM);
 	
-	printf("\n Digite a ordem de grandeza(K, M ou G): ");
+	printf("\nDigite a ordem de grandeza(K, M ou G): ");
 	scanf("\n%c", &c);
 	c = toupper(c);
 	
-	printf("\n Digite o número de repetições: ");
+	printf("\nDigite o número de repetições: ");
 	scanf("%d", &repeticoes);	
 	
-	while (n < repeticoes){
-		printf("\nTempo de execução foi de %0.1f ms", criarArquivo(TAM, c));
-		n++;
+	
+	//printf("\nThroughput médio p/ escrita sequencial foi de %f MiB/s", escritaSequencial(TAM, c, repeticoes));
+	//printf("\nThroughput médio p/ leitura sequencial foi de %f MiB/s", leituraSequencial(TAM, c, repeticoes));
+	
+	
+	for(i=0; i<=5; i++){
+		printf("\nThroughput médio p/ escrita aleatória p/ blocos de %d Kb foi de %f MiB/s", 
+		pot(2,i), escritaAleatoria(i, repeticoes));
+		
 	}
+	
+	for(i=0; i<=5; i++){
+		printf("\nThroughput médio p/ leitura aleatória p/ blocos de %d Kb foi de %f MiB/s", 
+		pot(2,i), leituraAleatoria(i, repeticoes));
+		
+	}*/
 	
 	return 0;
 }
 
-double criarArquivo(int tam, char letra){
-	int i, num=1;
+double escritaSequencial(int tam, char letra, int n){
+	int i, j, num=1;
 	FILE *arq;
 	clock_t inicio, fim; 
-	double dif_time;
+	double dif_time, media;
+	
+	media = 0;
+	j = 0;
 	
 	if(letra == 'K')
 		tam = tam*1024;
@@ -48,7 +122,40 @@ double criarArquivo(int tam, char letra){
 		 else if(letra == 'G')
 				tam = tam*1073741824;
 	
-	inicio = clock()/(CLOCKS_PER_SEC/1000);
+	while(j < n){
+		inicio = clock()/(CLOCKS_PER_SEC/1000000);
+		arq = fopen("ARQUIVO", "w");
+	
+		for(i=1; i<=tam; i++){
+			fprintf(arq, "%d", num);			
+		}		
+	
+		fclose(arq);
+		fim = clock()/(CLOCKS_PER_SEC/1000000);
+		dif_time = fim - inicio;
+		media = media + dif_time;
+		j++;
+	}
+	return (tam/((media/n)/1000000))/1048576;
+	
+}
+
+double leituraSequencial(int tam, char letra, int n){
+	int i, j, num=1;
+	FILE *arq;	
+	clock_t inicio, fim;
+	double dif_time, media;
+	
+	media = 0;
+	j = 0;
+	
+	if(letra == 'K')
+		tam = tam*1024;
+	else if(letra == 'M')
+			tam = tam*1048576;
+		 else if(letra == 'G')
+				tam = tam*1073741824;
+	
 	arq = fopen("ARQUIVO", "w");
 	
 	for(i=1; i<=tam; i++){
@@ -56,35 +163,107 @@ double criarArquivo(int tam, char letra){
 	}		
 	
 	fclose(arq);
-	fim = clock()/(CLOCKS_PER_SEC/1000);
-	dif_time = fim - inicio;
+				
+	while(j < n){
+		inicio = clock()/(CLOCKS_PER_SEC/1000000);
+		arq = fopen("ARQUIVO", "r");
 	
+		while(!feof(arq)){
+			fscanf(arq, "%d", &num);
+		}
+	
+		fclose(arq);
+		fim = clock()/(CLOCKS_PER_SEC/1000000);
+		dif_time = fim - inicio;
+		media = media + dif_time;
+		j++;	
+	}
 	//remove("ARQUIVO");
 	
-	return dif_time;
+	return (tam/((media/n)/1000000))/1048576;
+}
+
+double escritaAleatoria(int tam, int n){
+	int i, j, num=1;
+	FILE *arq;
+	clock_t inicio, fim;
+	double dif_time, media;
+	
+	j = 0;
+	media = 0;
+	tam = 1024*(pot(2,tam));
+	
+	while(j < n){
+		arq = fopen("ARQUIVO", "w");
+			//cria um arquivo de 4Mb para teste 
+		for(i=1; i<=4194304; i++){
+			fprintf(arq, "%d", num);			
+		}	
+		fclose(arq);
+	
+		inicio = clock()/(CLOCKS_PER_SEC/1000000);
+	
+		arq = fopen("ARQUIVO", "a");
+		rewind(arq);
+		fseek(arq, rand()%4194303, SEEK_SET);
+		for(i=1; i<=tam; i++){
+			fprintf(arq, "%d", num);
+		}
+		fclose(arq);
+		fim = clock()/(CLOCKS_PER_SEC/1000000);
+		dif_time = fim - inicio;
+		media = media + dif_time;
+		j++;
+	}
+	return (tam/((media/n)/1000000))/1048576;
+}
+
+double leituraAleatoria(int tam, int n){
+	int i, j, num=1;
+	FILE *arq;
+	clock_t inicio, fim;
+	double dif_time, media;
+	
+	j = 0;
+	media = 0;
+	tam = 1024*(pot(2,tam));
+	
+	while(j < n){
+		arq = fopen("ARQUIVO", "w");
+			//cria um arquivo de 4Mb para teste 
+		for(i=1; i<=4194304; i++){
+			fprintf(arq, "%d", num);			
+		}	
+		fclose(arq);
+	
+		inicio = clock()/(CLOCKS_PER_SEC/1000000);
+	
+		arq = fopen("ARQUIVO", "a");
+		rewind(arq);
+		fseek(arq, rand()%4161536, SEEK_SET);
+		for(i=1; i<=tam; i++){
+			fscanf(arq, "%d", &num);
+		}
+		fclose(arq);
+		fim = clock()/(CLOCKS_PER_SEC/1000000);
+		dif_time = fim - inicio;
+		media = media + dif_time;
+		j++;
+	}
+	return (tam/((media/n)/1000000))/1048576;
+	
 	
 }
 
-double lerArquivo(int tam, char letra){
-	int i;
-	FILE *arq;	
+int pot(int i, int j){
+	int a, prov=1;
 	
-	
-	if(letra == 'K')
-		tam = tam*1024;
-	else if(letra == 'M')
-			tam = tam*1048576;
-		 else if(letra == 'G')
-				tam = tam*1073741824;
-	
-	arq = fopen("ARQUIVO", "r");
-	
-	for(i=1; i<=tam; i++){
-	
-	
-	
-	
+	if(j==0)
+		return 1;
+	else
+		for(a=1; a<=j; a++){
+			prov = prov * i;
+		} return prov;
 	
 	
 }
-
