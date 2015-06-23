@@ -47,7 +47,7 @@ int main(){
 			media = leituraSequencial(TAM, c, repeticoes);
 			printf("\nThroughput médio p/ leitura sequencial foi de %f MiB/s", media);
 			printf("\nDesvio Padrão: %f", desvioPadrao(media, repeticoes));
-			printf("\nTempo total de execução: %f s", dif_timeT/1000);
+			printf("\nTempo total de execução: %f s", dif_timeT/1000000);
 			break;
 		case 2: 
 			printf("\nDigite o tamanho do arquivo(somente números): ");
@@ -63,7 +63,7 @@ int main(){
 			media = escritaSequencial(TAM, c, repeticoes);
 			printf("\nThroughput médio p/ escrita sequencial foi de %f MiB/s", media);
 			printf("\nDesvio Padrão: %f", desvioPadrao(media, repeticoes));
-			printf("\nTempo total de execução: %f s", dif_timeT/1000);
+			printf("\nTempo total de execução: %f s", dif_timeT/1000000);
 			break;
 		case 3:
 			printf("\nDigite o número de repetições: ");
@@ -73,7 +73,7 @@ int main(){
 				media = leituraAleatoria(i, repeticoes);
 				printf("\nThroughput médio p/ leitura aleatória p/ blocos de %d Kb foi de %f MiB/s", pot(2,i), media);
 				printf("\nDesvio Padrão: %f", desvioPadrao(media, repeticoes));
-				printf("\nTempo total de execução: %f s", dif_timeT/1000);
+				printf("\nTempo total de execução: %f s", dif_timeT/1000000);
 			} break;
 		case 4: 
 			printf("\nDigite o número de repetições: ");
@@ -83,7 +83,7 @@ int main(){
 				media = escritaAleatoria(i, repeticoes);
 				printf("\nThroughput médio p/ escrita aleatória p/ blocos de %d Kb foi de %f MiB/s",  pot(2,i), media);
 				printf("\nDesvio Padrão: %f", desvioPadrao(media, repeticoes));
-				printf("\nTempo total de execução: %f s", dif_timeT/1000);
+				printf("\nTempo total de execução: %f s", dif_timeT/1000000);
 			} break;
 		
 	}	
@@ -97,7 +97,7 @@ double escritaSequencial(int tam, char letra, int n){
 	clock_t inicio, fim, inicioT, fimT; 
 	double dif_time, media;
 	
-	inicioT = clock()/(CLOCKS_PER_SEC/1000);
+	inicioT = clock()/(CLOCKS_PER_SEC/1000000);
 	
 	media = 0;
 	j = 0;
@@ -121,12 +121,11 @@ double escritaSequencial(int tam, char letra, int n){
 		fim = clock()/(CLOCKS_PER_SEC/1000000);
 		dif_time = fim - inicio;
 		vetor[j] = (tam/(dif_time/1000000))/1048576;
-		//printf("%f ", vetor[j]);
 		media = media + dif_time;
 		j++;
 	}
 	
-	fimT = clock()/(CLOCKS_PER_SEC/1000);
+	fimT = clock()/(CLOCKS_PER_SEC/1000000);
 	dif_timeT = fimT - inicioT;
 	
 	return (tam/((media/n)/1000000))/1048576;
@@ -139,7 +138,7 @@ double leituraSequencial(int tam, char letra, int n){
 	clock_t inicio, fim, inicioT, fimT;
 	double dif_time, media;
 	
-	inicioT = clock()/(CLOCKS_PER_SEC/1000);
+	inicioT = clock()/(CLOCKS_PER_SEC/1000000);
 	
 	media = 0;
 	j = 0;
@@ -170,11 +169,12 @@ double leituraSequencial(int tam, char letra, int n){
 		fclose(arq);
 		fim = clock()/(CLOCKS_PER_SEC/1000000);
 		dif_time = fim - inicio;
+		vetor[j] = (tam/(dif_time/1000000))/1048576;
 		media = media + dif_time;
 		j++;	
 	}
 	
-	fimT = clock()/(CLOCKS_PER_SEC/1000);
+	fimT = clock()/(CLOCKS_PER_SEC/1000000);
 	dif_timeT = fimT - inicioT;
 	
 	return (tam/((media/n)/1000000))/1048576;
@@ -186,7 +186,7 @@ double escritaAleatoria(int tam, int n){
 	clock_t inicio, fim, inicioT, fimT;
 	double dif_time, media;
 	
-	inicioT = clock()/(CLOCKS_PER_SEC/1000);
+	inicioT = clock()/(CLOCKS_PER_SEC/1000000);
 	
 	j = 0;
 	media = 0;
@@ -211,10 +211,11 @@ double escritaAleatoria(int tam, int n){
 		fclose(arq);
 		fim = clock()/(CLOCKS_PER_SEC/1000000);
 		dif_time = fim - inicio;
+		vetor[j] = (tam/(dif_time/1000000))/1048576;
 		media = media + dif_time;
 		j++;
 	}
-	fimT = clock()/(CLOCKS_PER_SEC/1000);
+	fimT = clock()/(CLOCKS_PER_SEC/1000000);
 	dif_timeT = fimT - inicioT;
 	
 	return (tam/((media/n)/1000000))/1048576;
@@ -226,7 +227,7 @@ double leituraAleatoria(int tam, int n){
 	clock_t inicio, fim, inicioT, fimT;
 	double dif_time, media;
 	
-	inicioT = clock()/(CLOCKS_PER_SEC/1000);
+	inicioT = clock()/(CLOCKS_PER_SEC/1000000);
 	
 	j = 0;
 	media = 0;
@@ -244,17 +245,18 @@ double leituraAleatoria(int tam, int n){
 	
 		arq = fopen("ARQUIVO", "a");
 		rewind(arq);
-		fseek(arq, rand()%4161536, SEEK_SET);
+		fseek(arq, rand()%4194304, SEEK_SET);
 		for(i=1; i<=tam; i++){
 			fscanf(arq, "%d", &num);
 		}
 		fclose(arq);
 		fim = clock()/(CLOCKS_PER_SEC/1000000);
 		dif_time = fim - inicio;
+		vetor[j] = (tam/(dif_time/1000000))/1048576;
 		media = media + dif_time;
 		j++;
 	}
-	fimT = clock()/(CLOCKS_PER_SEC/1000);
+	fimT = clock()/(CLOCKS_PER_SEC/1000000);
 	dif_timeT = fimT - inicioT;
 	
 	return (tam/((media/n)/1000000))/1048576;
